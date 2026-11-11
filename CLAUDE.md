@@ -14,7 +14,8 @@ header `Authorization: <token>`): project `bhopui` (id A9Dg5EJy). New version: P
 `file`; version_type release, game_versions 26.3, loaders fabric, featured, no deps), then PATCH /v3/version/<id>
 `{"environment":"client_only"}`.
 Modrinth gets nothing build-related: its description is the README without the image line, the Build section and dev
-commands (those live only on GitHub). Changelogs say what changed for players, not how it was built.
+commands (those live only on GitHub), plus `**Source code:** [github.com/laurensanp/bhopui](https://github.com/laurensanp/bhopui)`
+right below the `# BhopUI` heading. Changelogs say what changed for players, not how it was built.
 
 - 1.0.1 (2026-11-11, Modrinth S9qidWKQ): new mod icon (bhop jumper on a speed slider, drawn by `icon/make_icon.py`; 512 px version is the Modrinth project icon).
 - 1.0.0 (2026-11-11): first release, Modrinth version nJgFlh1M. Project submitted for review the same day.
