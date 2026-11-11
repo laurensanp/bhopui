@@ -14,4 +14,5 @@ header `Authorization: <token>`): project `bhopui` (id A9Dg5EJy). New version: P
 `file`; version_type release, game_versions 26.3, loaders fabric, featured, no deps), then PATCH /v3/version/<id>
 `{"environment":"client_only"}`.
 
+- 1.0.1 (2026-11-11): new mod icon (bhop jumper on a speed slider, drawn by `icon/make_icon.py`; 512 px version is the Modrinth project icon).
 - 1.0.0 (2026-11-11): first release, Modrinth version nJgFlh1M. Project submitted for review the same day.
