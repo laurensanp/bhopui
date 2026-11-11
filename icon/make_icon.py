@@ -1,56 +1,66 @@
-"""Draws the BhopUI icon: a bunny hopping off a springy menu button. Run: python -I icon/make_icon.py"""
+"""Draws the BhopUI icon: a jumper chaining bunny hops along a slider that fills like a speed meter.
+Run: python -I icon/make_icon.py"""
 from pathlib import Path
 from PIL import Image, ImageDraw
 
 PANEL, INACTIVE, ACCENT, WHITE = "#201a0e", "#312c29", "#f1bea6", "#ffffff"
 S = 2048  # drawn at 4x of 512, then downscaled for smooth edges
 OUT = Path(__file__).parent
+GROUND = 1600
 
 
-def bar(img, cx, cy, w, h, fill, alpha=1.0):
-    layer = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    ImageDraw.Draw(layer).rounded_rectangle((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2), radius=h * 0.3, fill=fill)
-    if alpha < 1:
-        layer.putalpha(layer.getchannel("A").point(lambda a: int(a * alpha)))
-    img.alpha_composite(layer)
+def hop(d, x0, x1, height, dots, alpha, until=1.0):
+    """Dotted jump arc from x0 to x1 on the ground, drawn up to fraction `until`."""
+    for i in range(1, dots):
+        t = i / dots
+        if t > until:
+            break
+        x, y = x0 + (x1 - x0) * t, GROUND - 90 - height * 4 * t * (1 - t)
+        r = 20 + 10 * alpha
+        d.ellipse((x - r, y - r, x + r, y + r), fill=(255, 255, 255, int(255 * alpha)))
 
 
-def oval(img, cx, cy, w, h, angle, fill):
-    """Ellipse rotated counter-clockwise by angle degrees around its centre."""
-    n = int(max(w, h)) + 8
-    layer = Image.new("RGBA", (n, n), (0, 0, 0, 0))
-    ImageDraw.Draw(layer).ellipse(((n - w) / 2, (n - h) / 2, (n + w) / 2, (n + h) / 2), fill=fill)
-    layer = layer.rotate(angle, resample=Image.BICUBIC)
-    img.alpha_composite(layer, (int(cx - n / 2), int(cy - n / 2)))
+def limb(d, pts, w):
+    d.line(pts, fill=WHITE, width=w)
+    for x, y in pts:
+        d.ellipse((x - w / 2, y - w / 2, x + w / 2, y + w / 2), fill=WHITE)
+
+
+def jumper():
+    """Side view, crouched mid-air (the bhop jump), facing right."""
+    L = Image.new("RGBA", (900, 900), (0, 0, 0, 0))
+    d = ImageDraw.Draw(L)
+    limb(d, [(450, 330), (320, 440), (210, 370)], 80)          # arm swung back
+    d.rounded_rectangle((380, 280, 520, 570), radius=45, fill=WHITE)  # torso
+    limb(d, [(450, 540), (650, 470), (610, 690)], 115)         # legs tucked to the chest
+    limb(d, [(490, 340), (640, 330)], 75)                      # arm forward
+    d.rounded_rectangle((360, 70, 560, 260), radius=50, fill=WHITE)   # head
+    return L.rotate(-10, resample=Image.BICUBIC)               # lean into the jump
 
 
 def draw():
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    ImageDraw.Draw(img).rounded_rectangle((0, 0, S - 1, S - 1), radius=380, fill=PANEL)
-
-    # Menu: the accent button the bunny just pushed off (squashed wide), then buttons still being dealt in
-    bar(img, 1024, 1390, 1340, 200, ACCENT)
-    bar(img, 1024, 1650, 1180, 190, INACTIVE)
-    bar(img, 1024, 1880, 1060, 170, INACTIVE, 0.5)
-
-    # Hop trail from the button up to the bunny's back foot
     d = ImageDraw.Draw(img)
-    for i, (x, y) in enumerate(((400, 1250), (460, 1140), (540, 1045), (630, 975))):
-        r = 26 + 9 * i
-        d.ellipse((x - r, y - r, x + r, y + r), fill=(255, 255, 255, 80 + 45 * i))
+    d.rounded_rectangle((0, 0, S - 1, S - 1), radius=380, fill=PANEL)
 
-    # Bunny mid-hop, nose up, stretched out
-    bx, by = 1130, 830
-    oval(img, bx + 170, by - 470, 120, 400, 28, WHITE)        # back ear
-    oval(img, bx + 290, by - 480, 120, 420, 12, WHITE)        # front ear
-    oval(img, bx + 290, by - 470, 50, 280, 12, ACCENT)        # inner ear
-    oval(img, bx - 330, by + 120, 420, 140, 25, WHITE)        # back leg, kicked out
-    oval(img, bx, by, 660, 360, 20, WHITE)                    # body
-    oval(img, bx + 250, by + 120, 230, 100, -35, WHITE)       # front paws
-    oval(img, bx + 310, by - 230, 320, 290, 10, WHITE)        # head
-    oval(img, bx - 320, by - 30, 160, 160, 0, WHITE)          # tail
-    oval(img, bx + 380, by - 260, 52, 60, 0, PANEL)           # eye
-    oval(img, bx + 470, by - 190, 44, 36, 0, ACCENT)          # nose
+    # Slider track as the ground; the accent fill is the speed gained so far
+    d.rounded_rectangle((260, GROUND - 70, 1788, GROUND + 70), radius=42, fill=INACTIVE)
+    d.rounded_rectangle((260, GROUND - 70, 1380, GROUND + 70), radius=42, fill=ACCENT)
+
+    # Each hop longer and higher than the last
+    hop(d, 300, 620, 220, 5, 0.35)
+    hop(d, 620, 1050, 340, 7, 0.6)
+    hop(d, 1050, 1720, 520, 12, 0.9, until=0.42)  # the jump in progress, up to the jumper's feet
+
+    # Landing squashes where the hops touched the slider
+    for x in (620, 1050):
+        d.ellipse((x - 70, GROUND - 105, x + 70, GROUND - 75), fill=WHITE)
+
+    # Speed lines behind the jumper
+    for y, x0, a in ((560, 520, 110), (680, 400, 160), (800, 560, 90)):
+        d.rounded_rectangle((x0, y - 18, x0 + 380, y + 18), radius=18, fill=(255, 255, 255, a))
+
+    img.alpha_composite(jumper(), (790, 300))
     return img
 
 
