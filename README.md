@@ -1,3 +1,5 @@
+<img src="icon/icon-128.png" width="96" align="right">
+
 # BhopUI
 
 Springy menu animations for Minecraft 26.3 (Fabric, client only).
