@@ -1,0 +1,7 @@
+{
+	"required": true,
+	"package": "com.bhopui.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": ["ScreenMixin", "WidgetMixin", "SliderMixin"],
+	"injectors": { "defaultRequire": 1 }
+}

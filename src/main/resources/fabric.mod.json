@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"id": "bhopui",
+	"version": "${version}",
+	"name": "BhopUI",
+	"description": "Springy menu animations: menus pop open, options cascade in, buttons squash, sliders wobble.",
+	"license": "MIT",
+	"icon": "assets/bhopui/icon.png",
+	"environment": "client",
+	"mixins": [{ "config": "bhopui.mixins.json", "environment": "client" }],
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25"
+	}
+}
